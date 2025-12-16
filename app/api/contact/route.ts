@@ -1,30 +1,17 @@
 import { NextResponse } from 'next/server';
-
-interface Contact {
-  id: number;
-  name: string;
-  email: string;
-  message: string;
-  created_at: string;
-}
-
-let contacts: Contact[] = [];
+import { sql, createTable } from '../../../lib/db';
 
 export async function POST(request: Request) {
   try {
+    await createTable();
     const { name, email, message } = await request.json();
-    
-    const contact: Contact = {
-      id: Date.now(),
-      name,
-      email,
-      message,
-      created_at: new Date().toISOString()
-    };
-    
-    contacts.push(contact);
-    
-    console.log('New contact:', contact);
+
+    await sql`
+      INSERT INTO contacts (name, email, message)
+      VALUES (${name}, ${email}, ${message})
+    `;
+
+    console.log('New contact saved:', { name, email, message });
 
     return NextResponse.json({ success: true, message: 'Message saved successfully' });
   } catch (error) {
@@ -35,8 +22,10 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    return NextResponse.json({ success: true, data: contacts });
+    const { rows } = await sql`SELECT * FROM contacts ORDER BY created_at DESC`;
+    return NextResponse.json({ success: true, data: rows });
   } catch (error) {
+    console.error('Error:', error);
     return NextResponse.json({ success: false, error: 'Failed to fetch contacts' }, { status: 500 });
   }
 }
