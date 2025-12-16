@@ -63,12 +63,6 @@ export default function Projects() {
               </div>
 
               <div className="relative z-10">
-                {project.icon && (
-                  <div className="mb-6 group-hover:scale-125 group-hover:rotate-12 transition-all duration-500">
-                    {project.icon}
-                  </div>
-                )}
-
                 <h3 className="text-2xl font-black text-white mb-4">
                   {project.title}
                 </h3>
